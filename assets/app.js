@@ -767,19 +767,20 @@
     var q = null;
     try { q = new URLSearchParams(location.search); } catch (e) {}
 
+    var enabled = enabledChannels();
     var forced = q ? (q.get('c') || '').toLowerCase() : '';
-    if (forced === 'picker' || C.channels[forced]) return { channel: forced, why: 'url' };
+    if (forced === 'picker' || enabled.includes(forced)) return { channel: forced, why: 'url' };
 
     var ua = navigator.userAgent || '';
-    if (/MicroMessenger/i.test(ua)) return { channel: 'wechat', why: 'ua' };
-    if (/(AlipayClient|AlipayDefined|AliApp\(AP)/i.test(ua)) return { channel: 'alipay', why: 'ua' };
-    if (/(PayPal|PPSDK)/i.test(ua)) return { channel: 'paypal', why: 'ua' };
+    if (enabled.includes('wechat') && /MicroMessenger/i.test(ua)) return { channel: 'wechat', why: 'ua' };
+    if (enabled.includes('alipay') && /(AlipayClient|AlipayDefined|AliApp\(AP)/i.test(ua)) return { channel: 'alipay', why: 'ua' };
+    if (enabled.includes('paypal') && /(PayPal|PPSDK)/i.test(ua)) return { channel: 'paypal', why: 'ua' };
 
     var ref = document.referrer || '';
     if (ref) {
-      if (/weixin\.qq\.com|service\.wechat\.com/i.test(ref)) return { channel: 'wechat', why: 'referrer' };
-      if (/alipay\.com/i.test(ref)) return { channel: 'alipay', why: 'referrer' };
-      if (/paypal\.com/i.test(ref)) return { channel: 'paypal', why: 'referrer' };
+      if (enabled.includes('wechat') && /weixin\.qq\.com|service\.wechat\.com/i.test(ref)) return { channel: 'wechat', why: 'referrer' };
+      if (enabled.includes('alipay') && /alipay\.com/i.test(ref)) return { channel: 'alipay', why: 'referrer' };
+      if (enabled.includes('paypal') && /paypal\.com/i.test(ref)) return { channel: 'paypal', why: 'referrer' };
     }
 
     return { channel: 'picker', why: 'unknown' };
@@ -816,7 +817,7 @@
 
   function enabledChannels() {
     return ['wechat', 'alipay', 'paypal'].filter(function (k) {
-      return C.channels[k] && C.channels[k].enabled;
+      return C.channels[k] && C.channels[k].enabled && (k !== 'paypal' || Boolean(C.meta.paypalUrl));
     });
   }
 
@@ -899,7 +900,7 @@
   function renderChannel(ch, opts) {
     opts = opts || {};
     if (flipping) return;
-    if (ch !== 'picker' && !C.channels[ch]) ch = 'picker';
+    if (ch !== 'picker' && !enabledChannels().includes(ch)) ch = 'picker';
 
     function applyFace() {
       cardFace.innerHTML = faceHTML(ch);

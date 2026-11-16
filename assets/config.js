@@ -18,7 +18,7 @@ window.SPONSOR_CONFIG = {
     // 开源后换成你自己的仓库
     repo: 'https://github.com/JH0531/sponsor-me',
     // 换成你的 paypal.me
-    paypalUrl: 'https://paypal.me/Jasperhjx'
+    paypalUrl: ''
   },
 
   /* ────────────────────────────────────────────────────────────────────
@@ -214,7 +214,7 @@ window.SPONSOR_CONFIG = {
       }
     },
     alipay: {
-      enabled: true,
+      enabled: false,
       mark: 'alipay',
       qr: { light: 'assets/qr/alipay-light.png', dark: 'assets/qr/alipay-dark.png' },
       // 支付宝的标识不区分语言
@@ -237,7 +237,7 @@ window.SPONSOR_CONFIG = {
   i18n: {
     'zh-Hans': {
       pickerTitle: '选一个你顺手的',
-      pickerSub: '三个入口都在这里，扫码或转账都行',
+      pickerSub: '请选择赞助方式',
       roll: '赞助点别的？',
       backToPicker: '← 换个方式',
       backToLanding: '← 更换礼物',
@@ -261,7 +261,7 @@ window.SPONSOR_CONFIG = {
     },
     'en': {
       pickerTitle: 'Pick one',
-      pickerSub: 'All three are here. Scan or jump, your call.',
+      pickerSub: 'Choose a way to support.',
       roll: 'Sponsor something else?',
       backToPicker: '← Change method',
       backToLanding: '← Change gift',
