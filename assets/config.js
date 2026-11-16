@@ -18,7 +18,7 @@ window.SPONSOR_CONFIG = {
     // 开源后换成你自己的仓库
     repo: 'https://github.com/JH0531/sponsor-me',
     // 换成你的 paypal.me
-    paypalUrl: ''
+    paypalUrl: 'https://paypal.me/akesakiko'
   },
 
   /* ────────────────────────────────────────────────────────────────────
