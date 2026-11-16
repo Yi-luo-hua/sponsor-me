@@ -4,10 +4,9 @@
    读的是同一份配置，所以新增一个礼物只需要在这里加一条，然后跑一次构建。
 
    结构总览：
-     meta      —— 仓库地址、PayPal 收款链接
+     meta      —— PayPal 收款链接
      media     —— 媒体注册表。key 就是文件名（不含扩展名），全局唯一。
      items     —— 每种语言一份条目列表，靠 media 名跨语言匹配
-     danmaku   —— 每种语言一份弹幕
      channels  —— 渠道定义（二维码路径按主题区分）
      i18n      —— 界面文案
    ========================================================================== */
@@ -16,7 +15,6 @@ window.SPONSOR_CONFIG = {
 
   meta: {
     // 开源后换成你自己的仓库
-    repo: 'https://github.com/JH0531/sponsor-me',
     // 换成你的 paypal.me
     paypalUrl: 'https://paypal.me/akesakiko'
   },
@@ -157,48 +155,6 @@ window.SPONSOR_CONFIG = {
   },
 
   /* ────────────────────────────────────────────────────────────────────
-     弹幕（按语言分组）
-     ──────────────────────────────────────────────────────────────────── */
-  danmaku: {
-    'zh-Hans': [
-      '这位金主，您的咖啡已到账',
-      '老板大气，代码都香了',
-      '一杯咖啡，续命三小时',
-      '已投喂，作者又能写两行',
-      '此处应有掌声',
-      '打赏的不是钱，是精神股东',
-      '你这一下，服务器都抖了三抖',
-      '确认过眼神，是会赞助的人',
-      '今日份的赛博香油钱',
-      '作者：收到，马上加班（不是）',
-      '小额赞助，大额感动',
-      '这位朋友，你的手速很快',
-      '咖啡因 +1，bug −1',
-      '你的头像已在功德榜上闪烁',
-      '感谢投喂，产品经理已被劝退',
-      '赞助成功，作者原地满血'
-    ],
-    'en': [
-      'The coffee has landed.',
-      'Absolute legend.',
-      'One coffee, three more hours of code.',
-      'Fed. The author can write two more lines.',
-      'Somebody give this person a round of applause.',
-      'Not a donation — a shareholder position.',
-      'The server felt that one.',
-      'Confirmed: this person sponsors.',
-      'Today\u2019s digital offering.',
-      'Author: received. Overtime commencing. (jk)',
-      'Small amount, big feelings.',
-      'Fast hands, kind heart.',
-      'Caffeine +1, bugs −1.',
-      'Your name is now glowing on the wall of honor.',
-      'Thanks. The PM has been escorted out.',
-      'Sponsorship received. Author restored to full HP.'
-    ]
-  },
-
-  /* ────────────────────────────────────────────────────────────────────
      渠道
      qr 按主题给两份；PayPal 没有二维码，用 paypalUrl 跳转。
      ──────────────────────────────────────────────────────────────────── */
@@ -241,7 +197,6 @@ window.SPONSOR_CONFIG = {
       roll: '赞助点别的？',
       backToPicker: '← 换个方式',
       backToLanding: '← 更换礼物',
-      repo: '本库 GitHub',
       themeToDark: '切换到深色模式',
       themeToLight: '切换到浅色模式',
       langLabel: '切换语言',
@@ -265,7 +220,6 @@ window.SPONSOR_CONFIG = {
       roll: 'Sponsor something else?',
       backToPicker: '← Change method',
       backToLanding: '← Change gift',
-      repo: 'View source on GitHub',
       themeToDark: 'Switch to dark mode',
       themeToLight: 'Switch to light mode',
       langLabel: 'Change language',

@@ -4,7 +4,7 @@
 
    代码分块（从上到下）：
      prefs / theme / i18n / media / confetti / state / roll / launch
-     sniff / channel / danmaku / dock / boot
+     sniff / channel / dock / boot
 
    改文案和素材请去 assets/config.js，这个文件只负责行为。
    ========================================================================== */
@@ -75,11 +75,7 @@
 
   var card       = $('#card');
   var cardFace   = $('#cardFace');
-  var repoLink   = $('#repoLink');
-  var repoText   = $('#repoText');
 
-  var dmBack     = $('#dmBack');
-  var dmFront    = $('#dmFront');
 
   var mainBtn    = $('#mainBtn');
   var mainLabel  = $('#mainBtnLabel');
@@ -115,10 +111,7 @@
     flipOut: 400,
     popOut: 420,
     dropIn: 900,
-    rollThrottle: 700,
-    dmStart: 900,
-    dmGapMin: 520,
-    dmGapMax: 1100
+    rollThrottle: 700
   };
 
   /* ══════════════════════════════════════════════════════════════════════
@@ -207,9 +200,6 @@
   function applyStrings() {
     var t = C.i18n[lang];
     document.documentElement.lang = lang === 'en' ? 'en' : 'zh-Hans';
-    repoText.textContent = t.repo;
-    repoLink.href = C.meta.repo;
-    repoLink.setAttribute('aria-label', t.repo);
     langBtn.setAttribute('aria-label', t.langLabel);
     langBtn.title = t.langLabel;
     themeBtn.setAttribute('aria-label', theme === 'dark' ? t.themeToLight : t.themeToDark);
@@ -241,7 +231,6 @@
       }
     }
 
-    dmBag = [];
     if (state === 'channel') refreshChannelFace();
     savePref('lang', next);
   }
@@ -728,7 +717,6 @@
     channel = detectChannel().channel;
     setState('channel');
     renderChannel(channel, { animate: !reduceMotion });
-    startDanmaku();
   }
 
   /** 从打赏页退回着陆页：取消发射动画，重播一次入场，物品保持不变 */
@@ -740,7 +728,6 @@
     heroPop.getAnimations().forEach(function (a) { a.cancel(); });
     hero.classList.remove('is-popping', 'is-dropping');
 
-    stopDanmaku();
     // 回退后要像"刚进入页面"一样：停在第一帧，等 hover / 点击再播
     resetMedia();
     setState('idle');
@@ -953,111 +940,6 @@
   }
 
   /* ══════════════════════════════════════════════════════════════════════
-     十四、弹幕
-     ══════════════════════════════════════════════════════════════════════ */
-
-  var TRACK_H = 44;
-  var dmBag = [];
-  var dmTimer = 0;
-  var dmOn = false;
-  var dmQuiet = null;
-  var dmQuietTimer = 0;
-
-  function dmPool() {
-    return (C.danmaku[lang] && C.danmaku[lang].length) ? C.danmaku[lang] : C.danmaku.en;
-  }
-
-  function trackY(isFront) {
-    var h = sceneCh.clientHeight;
-    var count = Math.floor((h * 0.74) / TRACK_H);
-    var box = isFront ? card.getBoundingClientRect() : null;
-    var out = [];
-    for (var i = 0; i < count; i++) {
-      var y = 44 + i * TRACK_H;
-      if (isFront && box) {
-        if (y + 34 > box.top - 10 && y < box.bottom + 10) continue;
-      }
-      out.push(y);
-    }
-    return out;
-  }
-
-  function spawnDm() {
-    if (!dmOn) return;
-
-    var front = Math.random() < 0.2;
-    var layer = front ? dmFront : dmBack;
-    var cap = front ? 4 : 12;
-    if (layer.childElementCount >= cap) { scheduleDm(); return; }
-
-    var ys = trackY(front);
-    if (!ys.length) { scheduleDm(); return; }
-
-    var y = ys[randInt(0, ys.length - 1)];
-    var el = document.createElement('span');
-    el.className = 'dm__item' + (front ? ' dm__item--front' : '');
-    if (!dmBag.length) dmBag = shuffle(dmPool().slice());
-    el.textContent = dmBag.shift();
-    layer.appendChild(el);
-
-    var w = el.offsetWidth || 200;
-    var vw = sceneCh.clientWidth;
-    var speed = front ? rand(190, 250) : rand(148, 196);
-    var dur = ((vw + w + 60) / speed) * 1000;
-
-    var a = el.animate([
-      { transform: 'translate3d(' + (vw + 20) + 'px,' + y + 'px,0)' },
-      { transform: 'translate3d(' + (-w - 40) + 'px,' + y + 'px,0)' }
-    ], { duration: dur, easing: 'linear' });
-
-    a.finished.then(function () { el.remove(); }, function () { el.remove(); });
-    scheduleDm();
-  }
-
-  function scheduleDm() {
-    clearTimeout(dmTimer);
-    if (!dmOn) return;
-    dmTimer = setTimeout(spawnDm, rand(T.dmGapMin, T.dmGapMax));
-  }
-
-  function startDanmaku() {
-    if (reduceMotion) {
-      dmQuiet = document.createElement('span');
-      dmQuiet.className = 'dm__quiet';
-      dmQuiet.textContent = pick(dmPool());
-      dmBack.classList.add('dm--static');
-      dmBack.appendChild(dmQuiet);
-      requestAnimationFrame(function () { dmQuiet.classList.add('is-on'); });
-      dmQuietTimer = setInterval(function () {
-        if (!dmQuiet) return;
-        dmQuiet.classList.remove('is-on');
-        setTimeout(function () {
-          if (!dmQuiet) return;
-          dmQuiet.textContent = pick(dmPool());
-          dmQuiet.classList.add('is-on');
-        }, 420);
-      }, 6000);
-      return;
-    }
-
-    setTimeout(function () {
-      if (state !== 'channel') return;
-      dmOn = true;
-      scheduleDm();
-    }, T.dmStart);
-  }
-
-  function stopDanmaku() {
-    dmOn = false;
-    clearTimeout(dmTimer);
-    clearInterval(dmQuietTimer);
-    if (dmQuiet) { dmQuiet.remove(); dmQuiet = null; }
-    dmBack.classList.remove('dm--static');
-    dmBack.textContent = '';
-    dmFront.textContent = '';
-  }
-
-  /* ══════════════════════════════════════════════════════════════════════
      十五、事件
      ══════════════════════════════════════════════════════════════════════ */
 
@@ -1143,12 +1025,7 @@
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
       parts.length = 0;
-      dmOn = false;
-      clearTimeout(dmTimer);
       if (media.anim) { try { media.anim.pause(); } catch (e) {} }
-    } else if (state === 'channel' && !reduceMotion) {
-      dmOn = true;
-      scheduleDm();
     }
   });
 
