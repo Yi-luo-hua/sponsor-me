@@ -71,7 +71,6 @@
 
   var caption     = $('#caption');
   var captionText = $('#captionText');
-  var blurb       = $('#blurb');
 
   var card       = $('#card');
   var cardFace   = $('#cardFace');
@@ -238,7 +237,6 @@
   function renderCaption() {
     if (!current) return;
     captionText.textContent = current.caption;
-    blurb.textContent = current.blurb || '';
   }
 
   /* ══════════════════════════════════════════════════════════════════════
@@ -698,7 +696,6 @@
 
       shrinkOut(finger, D * 0.14, D * 0.16);
       shrinkOut(caption, D * 0.15, D * 0.15);
-      shrinkOut(blurb, D * 0.16, D * 0.15);
     }
 
     burst(cx, cy, 110, { power: 1 });
@@ -1048,7 +1045,6 @@
 
     if (!enabledChannels().length) {
       captionText.textContent = C.i18n[lang].noChannel;
-      blurb.textContent = C.i18n[lang].noChannelSub;
     }
 
     setItem(itemsOf(lang)[0]);
