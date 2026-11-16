@@ -214,7 +214,7 @@ window.SPONSOR_CONFIG = {
       }
     },
     alipay: {
-      enabled: false,
+      enabled: true,
       mark: 'alipay',
       qr: { light: 'assets/qr/alipay-light.png', dark: 'assets/qr/alipay-dark.png' },
       // 支付宝的标识不区分语言
