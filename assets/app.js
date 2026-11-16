@@ -3,7 +3,7 @@
    单页状态机：boot → idle ⇄ rolling / idle → launching → channel ⇄ idle
 
    代码分块（从上到下）：
-     prefs / theme / i18n / media / confetti / state / roll / launch
+     prefs / i18n / media / confetti / state / roll / launch
      sniff / channel / dock / boot
 
    改文案和素材请去 assets/config.js，这个文件只负责行为。
@@ -78,13 +78,11 @@
 
   var mainBtn    = $('#mainBtn');
   var mainLabel  = $('#mainBtnLabel');
-  var themeBtn   = $('#themeBtn');
   var langBtn    = $('#langBtn');
   var langMenu   = $('#langMenu');
 
   var canvas     = $('#fx');
   var ctx        = canvas.getContext('2d');
-  var metaTheme  = document.querySelector('meta[name="theme-color"]');
 
   /* ══════════════════════════════════════════════════════════════════════
      三、运行时状态
@@ -97,7 +95,6 @@
   var lastRoll = 0;
   var channel = 'picker';
 
-  var theme = 'light';
   var lang = 'zh-Hans';
 
   var current = null;          // 当前条目（config.items[lang] 里的一项）
@@ -112,63 +109,6 @@
     dropIn: 900,
     rollThrottle: 700
   };
-
-  /* ══════════════════════════════════════════════════════════════════════
-     四、主题
-
-     自动路由：能读到系统偏好就用系统的，读不到 fallback 到 light。
-     手动切换后写进 localStorage，下次优先用用户的选择。
-     ══════════════════════════════════════════════════════════════════════ */
-
-  function detectTheme() {
-    try {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
-    } catch (e) {}
-    return 'light';
-  }
-
-  function paintTheme(t) {
-    theme = t;
-    document.documentElement.dataset.theme = t;
-    if (metaTheme) metaTheme.setAttribute('content', t === 'dark' ? '#1c1611' : '#fff5e2');
-    var label = t === 'dark' ? C.i18n[lang].themeToLight : C.i18n[lang].themeToDark;
-    themeBtn.setAttribute('aria-label', label);
-    themeBtn.title = label;
-  }
-
-  /**
-   * 切换主题。支持 View Transitions 时用「以按钮为圆心的圆形遮罩」展开；
-   * 不支持时直接换 —— 不做假遮罩，因为遮罩颜色和真实渐变背景对不上会露馅。
-   */
-  function setTheme(next, opts) {
-    opts = opts || {};
-    if (next === theme) return;
-
-    var swap = function () {
-      paintTheme(next);
-      refreshChannelFace();
-      savePref('theme', next);
-    };
-
-    if (!opts.animate || reduceMotion || !document.startViewTransition) {
-      swap();
-      return;
-    }
-
-    var x = opts.x || window.innerWidth / 2;
-    var y = opts.y || window.innerHeight - 60;
-    var r = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
-
-    var vt = document.startViewTransition(swap);
-    vt.ready.then(function () {
-      document.documentElement.animate(
-        { clipPath: ['circle(0px at ' + x + 'px ' + y + 'px)',
-                     'circle(' + r + 'px at ' + x + 'px ' + y + 'px)'] },
-        { duration: 520, easing: 'cubic-bezier(.4,0,.2,1)',
-          pseudoElement: '::view-transition-new(root)' }
-      );
-    }).catch(function () {});
-  }
 
   /* ══════════════════════════════════════════════════════════════════════
      五、语言
@@ -201,8 +141,6 @@
     document.documentElement.lang = lang === 'en' ? 'en' : 'zh-Hans';
     langBtn.setAttribute('aria-label', t.langLabel);
     langBtn.title = t.langLabel;
-    themeBtn.setAttribute('aria-label', theme === 'dark' ? t.themeToLight : t.themeToDark);
-    themeBtn.title = themeBtn.getAttribute('aria-label');
 
     var opts = langMenu.querySelectorAll('.lang-menu__item');
     for (var i = 0; i < opts.length; i++) {
@@ -807,7 +745,7 @@
 
   function markSrc(k) {
     var ch = C.channels[k];
-    if (k === 'paypal') return theme === 'dark' ? ch.symbol.dark : ch.symbol.light;
+    if (k === 'paypal') return ch.symbol.light;
     if (k === 'wechat') return 'assets/brand/wechat-pay-mono.svg';
     return 'assets/brand/alipay-mono.svg';
   }
@@ -840,8 +778,8 @@
     if (ch === 'paypal') {
       return '' +
         '<div class="paypal">' +
-          '<img class="paypal__symbol" src="' + (theme === 'dark' ? c.symbol.dark : c.symbol.light) + '" alt="PayPal" width="54" height="54">' +
-          '<img class="paypal__word" src="' + (theme === 'dark' ? c.wordmark.dark : c.wordmark.light) + '" alt="PayPal">' +
+          '<img class="paypal__symbol" src="' + (c.symbol.light) + '" alt="PayPal" width="54" height="54">' +
+          '<img class="paypal__word" src="' + (c.wordmark.light) + '" alt="PayPal">' +
           '<p class="paypal__hint">' + t.paypalHint + '</p>' +
           '<a class="paypal__btn" href="' + C.meta.paypalUrl + '" target="_blank" rel="noopener noreferrer">' +
             t.paypalBtn + ' ↗' +
@@ -852,13 +790,13 @@
 
     // 微信 / 支付宝
     var logo = c.logo[lang] || c.logo;
-    var logoSrc = logo && logo[theme] ? logo[theme] : '';
+    var logoSrc = logo && logo.light ? logo.light : '';
 
     return '' +
       '<div class="face__brand face__brand--' + ch + (lang === 'en' && ch === 'wechat' ? ' face__brand--en' : '') + '">' +
         '<img src="' + logoSrc + '" alt="' + t[ch + 'Name'] + '">' +
       '</div>' +
-      '<img class="qr" src="' + c.qr[theme] + '" alt="' + t[ch + 'Name'] + '" ' +
+      '<img class="qr" src="' + c.qr.light + '" alt="' + t[ch + 'Name'] + '" ' +
         'width="500" height="500" draggable="false">' +
       '<p class="qr-hint">' + t[ch + 'Hint'] + '</p>';
   }
@@ -872,7 +810,7 @@
     }
   }
 
-  /** 只换内容不翻转，用于主题/语言切换 */
+  /** 只换内容不翻转，用于语言切换 */
   function refreshChannelFace() {
     if (state !== 'channel' || !cardRendered) return;
     cardFace.innerHTML = faceHTML(channel);
@@ -977,15 +915,6 @@
     if (action === 'toLanding') { returnToLanding(); }
   });
 
-  themeBtn.addEventListener('click', function () {
-    var r = this.getBoundingClientRect();
-    setTheme(theme === 'dark' ? 'light' : 'dark', {
-      animate: true,
-      x: r.left + r.width / 2,
-      y: r.top + r.height / 2
-    });
-  });
-
   function closeLangMenu() {
     langMenu.classList.remove('is-open');
     langMenu.setAttribute('aria-hidden', 'true');
@@ -1039,8 +968,6 @@
 
     var saved = readPrefs();
     lang = (saved.lang && C.i18n[saved.lang]) ? saved.lang : detectLang();
-    theme = (saved.theme === 'dark' || saved.theme === 'light') ? saved.theme : detectTheme();
-    paintTheme(theme);
     applyStrings();
 
     if (!enabledChannels().length) {

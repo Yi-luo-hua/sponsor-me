@@ -168,10 +168,8 @@ const snap = (page) => page.screenshot({ type: 'png', clip: CROP, animations: 'a
 /* ── 静帧 ─────────────────────────────────────────────────────────────── */
 const STILLS = [
   { id: 'idle-light-zh-v1', state: 'idle', lang: 'zh-Hans', theme: 'light' },
-  { id: 'idle-dark-zh-v1', state: 'idle', lang: 'zh-Hans', theme: 'dark' },
   { id: 'idle-light-en-v1', state: 'idle', lang: 'en', theme: 'light' },
   { id: 'picker-light-zh-v1', q: '?c=picker', dom: '.picker', lang: 'zh-Hans', theme: 'light' },
-  { id: 'picker-dark-zh-v1', q: '?c=picker', dom: '.picker', lang: 'zh-Hans', theme: 'dark' },
   { id: 'picker-light-en-v1', q: '?c=picker', dom: '.picker', lang: 'en', theme: 'light' },
   { id: 'wechat-light-zh-v1', q: '?c=wechat', dom: '.qr[src*="wechat"]', lang: 'zh-Hans', theme: 'light' },
   { id: 'alipay-light-zh-v1', q: '?c=alipay', dom: '.qr[src*="alipay"]', lang: 'zh-Hans', theme: 'light' },
@@ -203,21 +201,6 @@ async function animations(browser) {
     for (let i = 0; i < 14; i++) { bufs.push(await snap(page)); await page.waitForTimeout(90); }
     await ctx.close();
     emit('gift-roll-v1.anim.png', apngOf(bufs, 100));
-  }
-
-  // 主题切换：点按钮触发 520ms 圆形遮罩，预留 800ms
-  {
-    const { ctx, page } = await openCtx(browser, spec);
-    await boot(page);
-    const vt = await page.evaluate(() => !!document.startViewTransition);
-    console.log(`  View Transitions: ${vt ? '支持' : '不支持（退化为直接换色）'}`);
-    const bufs = [await snap(page)];
-    await page.waitForTimeout(80);
-    bufs.push(await snap(page));
-    await page.click('#themeBtn');
-    for (let i = 0; i < 10; i++) { bufs.push(await snap(page)); await page.waitForTimeout(80); }
-    await ctx.close();
-    emit('theme-toggle-v1.anim.png', apngOf(bufs, 80));
   }
 
   // 语言切换：展开菜单 → 选 English
@@ -253,8 +236,6 @@ async function journey(browser) {
     { t: 6.5, name: '切到 English', fn: () => page.locator('.lang-menu__item[data-lang="en"]').click() },
     { t: 7.2, name: '展开语言菜单', fn: () => page.click('#langBtn') },
     { t: 7.7, name: '切回中文', fn: () => page.locator('.lang-menu__item[data-lang="zh-Hans"]').click() },
-    { t: 8.4, name: '主题切换①', fn: () => page.click('#themeBtn') },
-    { t: 10.0, name: '主题切换②', fn: () => page.click('#themeBtn') },
     { t: 12.0, name: '点热饮（礼花）', fn: () => page.click('#heroHit') },
     { t: 15.8, name: '微信支付', fn: () => page.locator('.picker__item[data-ch="wechat"]').click() },
     { t: 18.3, name: '返回选择页', fn: () => page.click('#mainBtn') },
