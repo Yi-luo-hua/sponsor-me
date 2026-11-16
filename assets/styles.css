@@ -711,22 +711,6 @@ html[data-theme="dark"] .icon-btn__sun  { display: block; }
 
 .picker { display: flex; flex-direction: column; gap: 7px; }
 
-.picker__title {
-  margin: 2px 0 3px;
-  font-size: 15.5px;
-  font-weight: 700;
-  text-align: center;
-  color: var(--ink-0);
-}
-
-.picker__sub {
-  margin: 0 0 10px;
-  font-size: 12px;
-  line-height: 1.5;
-  text-align: center;
-  color: var(--ink-2);
-}
-
 .picker__item {
   display: flex;
   align-items: center;

@@ -836,8 +836,6 @@
 
       return '' +
         '<div class="picker">' +
-          '<p class="picker__title">' + t.pickerTitle + '</p>' +
-          '<p class="picker__sub">' + t.pickerSub + '</p>' +
           list +
         '</div>';
     }

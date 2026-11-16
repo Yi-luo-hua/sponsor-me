@@ -192,8 +192,6 @@ window.SPONSOR_CONFIG = {
      ──────────────────────────────────────────────────────────────────── */
   i18n: {
     'zh-Hans': {
-      pickerTitle: '选一个你顺手的',
-      pickerSub: '请选择赞助方式',
       roll: '赞助点别的？',
       backToPicker: '← 换个方式',
       backToLanding: '← 更换礼物',
@@ -215,8 +213,6 @@ window.SPONSOR_CONFIG = {
       noChannelSub: '先别急着赞助，等他配好'
     },
     'en': {
-      pickerTitle: 'Pick one',
-      pickerSub: 'Choose a way to support.',
       roll: 'Sponsor something else?',
       backToPicker: '← Change method',
       backToLanding: '← Change gift',
